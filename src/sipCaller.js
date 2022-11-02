@@ -120,7 +120,6 @@ export default class SipCaller {
 
   _handleSession(sipSession, direction) {
     logger.debug('_handleSession() [sipSession: %o]', sipSession);
-    console.log(sipSession);
 
     const startTime = Date.now();
 
