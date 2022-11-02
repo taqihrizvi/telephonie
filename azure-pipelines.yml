@@ -10,13 +10,14 @@ steps:
     versionSpec: '16.x'
     checkLatest: true
   displayName: 'Install Node.js'
-
-- script: |
+- script:
     npm install
   displayName: 'npm install'
 
-- script: |
-    npm run build
+# - script:  env | sort
+#   displayName: Add env and sort
+
+- script: npm run build
   displayName: 'npm build'
 - task: ArchiveFiles@2
   inputs:
