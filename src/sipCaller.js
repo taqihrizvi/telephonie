@@ -205,8 +205,6 @@ export default class SipCaller {
 
     sipSession.on('accepted', (data) => {
       logger.debug('SipSession accepted [data: %o, sipSession: %o]', data, sipSession);
-      console.log(data);
-      console.log(sipSession);
 
       store.dispatch(
         stateActions.setSessionState({
@@ -334,7 +332,7 @@ export default class SipCaller {
   invite(sipUri) {
     logger.debug('invite() [sipUri: %s]', sipUri);
 
-    const { videoEnabled } = store.getState().user;
+    // const { videoEnabled } = store.getState().user;
 
     const sipSession = this._ua?.invite(sipUri, {
       sessionDescriptionHandlerOptions: {
@@ -347,9 +345,9 @@ export default class SipCaller {
       inviteWithoutSdp: true,
     });
     this._handleSession(sipSession, sessionStates.OUTGOING);
-    store.dispatch(
-      stateActions.setCurrentSession({
-        currentSession: sipSession.request.callId,
+    store?.dispatch(
+      stateActions?.setCurrentSession({
+        currentSession: sipSession?.request?.callId,
       })
     );
   }
