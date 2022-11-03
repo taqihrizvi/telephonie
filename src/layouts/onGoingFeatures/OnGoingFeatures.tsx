@@ -1,18 +1,23 @@
 import React, { MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import Divider from '../../components/Divider';
 import Options from '../../components/Options';
 import { Tele_Force_Images } from '../../config/images';
+import * as stateActions from '../../components/actions/stateActions';
 import { setActiveDialer } from '../../store/slices/UI/Dialer';
 import { setActiveView } from '../../store/slices/UI/footerMenu';
 import { useAppDispatch, useAppSelector } from '../../components/hooks/hook';
 import { setApplyCalling, setTransferCall } from '../../store/slices/Call/callSession';
+import { WithSipCallerContext } from '../../sipCallerContext';
 
-const OnGoingFeatures = () => {
+const OnGoingFeatures = (props: any) => {
   const [number, setNumber] = useState<string>('');
   const active = useAppSelector((state: any): boolean => state.dialerSlice.activeView);
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '0', '#'];
+  const { sipCaller, session } = props;
 
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -31,6 +36,14 @@ const OnGoingFeatures = () => {
   const removeHandler = (e: MouseEvent<HTMLElement>): void => {
     e.preventDefault();
     setNumber(number.slice(0, -1));
+  };
+
+  const holdHandler = () => {
+    sipCaller.toggleMyMedia(session, 'audio', !session.sipSession.localAudioMuted);
+  };
+
+  const pausePlayHandler = () => {
+    sipCaller.toggleMedia(session, 'audio', !session.remoteAudioMuted);
   };
 
   return (
@@ -57,9 +70,9 @@ const OnGoingFeatures = () => {
               </div>
             )}
             {number !== '' && <Divider customClass="m-auto -mt-3">______________________________________________</Divider>}
-            <div className="w-[340px] m-auto mt-2">
+            <div className="w-[340px] m-auto mt-2 ">
               {numbers.map((char: string) => (
-                <button color="primary" key={char} onClick={() => setNumber(number + char)} className="w-[100px] h-[60px] m-1.5 font-semibold text-xl border-[2px] border-border rounded-md ">
+                <button color="primary" key={char} onClick={() => setNumber(number + char)} className="w-[100px] h-[60px] m-1.5 font-semibold text-xl border-[2px] border-border rounded-md  ">
                   {char}
                 </button>
               ))}
@@ -68,12 +81,12 @@ const OnGoingFeatures = () => {
         </>
       ) : (
         <>
-          <div className="flex justify-evenly">
+          <div className="flex justify-evenly ml-3  ">
             <Options imageSource={Tele_Force_Images.Record} title={t('Start rec')} />
-            <Options imageSource={Tele_Force_Images.MICRO_PHONE} title={t('Mute')} />
-            <Options imageSource={Tele_Force_Images.PAUSE} title={t('Hold')} />
+            <Options imageSource={session.localAudioMuted ? Tele_Force_Images.BLUE_MICROPHONE : Tele_Force_Images.MICRO_PHONE} title={session.localAudioMuted ? t('UnMute') : t('Mute')} onClick={holdHandler} />
+            <Options imageSource={session.remoteAudioMuted ? Tele_Force_Images.BlUE_PLAY : Tele_Force_Images.PAUSE} title={session.remoteAudioMuted ? t('Play') : t('Hold')} onClick={pausePlayHandler} />
           </div>
-          <div className="flex">
+          <div className="flex ml-3 ">
             <Options imageSource={Tele_Force_Images.DOTS_NINE} title={t('Keypad')} onClick={openDialer} />
             <Options imageSource={Tele_Force_Images.USER_PLUS} title={t('Add Call')} />
             <Options imageSource={Tele_Force_Images.TRANSFER_CALL} title={t('Transfer')} onClick={transferCallHandler} />
@@ -84,4 +97,17 @@ const OnGoingFeatures = () => {
   );
 };
 
-export default OnGoingFeatures;
+OnGoingFeatures.protoTypes = {
+  sipCaller: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state: any) => ({
+  session: state.sessions[state.userStatus.currentSession],
+  transferUri: state.user.transferUri,
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+  setTransferUri: (transferUri: any) => dispatch(stateActions.setTransferUri({ transferUri })),
+});
+
+export default WithSipCallerContext(connect(mapStateToProps, mapDispatchToProps)(OnGoingFeatures));

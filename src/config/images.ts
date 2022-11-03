@@ -2,6 +2,8 @@ export enum Tele_Force_Images {
   ARROW = 'Assests/Arrow.svg',
   AVATAR = 'Assests/Avatar.svg',
   BACK_SPACE = 'Assests/Backspace.svg',
+  BLUE_MICROPHONE = 'Assests/BlueMicrophone.svg',
+  BlUE_PLAY = 'Assests/Blue_Play.svg',
   CALL_BUTTON = 'Assests/CallButton.svg',
   CALL_BUTTON_CANCEL = 'Assests/Call-Cancel.svg',
   CALL_END = 'Assests/CallEnd.svg',

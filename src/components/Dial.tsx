@@ -16,7 +16,6 @@ const Dial = (props: any) => {
   const dispatch = useAppDispatch();
 
   const activateCall = () => {
-    console.log(userSipCaller);
     userSipCaller?.invite(number);
     dispatch(setApplyCalling(true));
     dispatch(setDialerNumber(number));

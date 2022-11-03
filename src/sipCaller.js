@@ -127,6 +127,7 @@ export default class SipCaller {
       logger.debug('SipSession trackAdded [sipSession: %o]', sipSession);
 
       const pc = sipSession.sessionDescriptionHandler.peerConnection;
+      console.log(sipSession.sessionDescriptionHandler.peerConnection.getReceivers()); // for temporary reasons
 
       // Gets remote tracks
       const remoteStream = new MediaStream();
@@ -204,6 +205,8 @@ export default class SipCaller {
 
     sipSession.on('accepted', (data) => {
       logger.debug('SipSession accepted [data: %o, sipSession: %o]', data, sipSession);
+      console.log(data); // temporary use
+      console.log(sipSession); // temporary use
 
       store.dispatch(
         stateActions.setSessionState({
@@ -331,7 +334,7 @@ export default class SipCaller {
   invite(sipUri) {
     logger.debug('invite() [sipUri: %s]', sipUri);
 
-    // const { videoEnabled } = store.getState().user;
+    const { videoEnabled } = store.getState().user;
 
     const sipSession = this._ua?.invite(sipUri, {
       sessionDescriptionHandlerOptions: {
@@ -344,9 +347,9 @@ export default class SipCaller {
       inviteWithoutSdp: true,
     });
     this._handleSession(sipSession, sessionStates.OUTGOING);
-    store?.dispatch(
-      stateActions?.setCurrentSession({
-        currentSession: sipSession?.request?.callId,
+    store.dispatch(
+      stateActions.setCurrentSession({
+        currentSession: sipSession.request.callId,
       })
     );
   }
@@ -358,8 +361,7 @@ export default class SipCaller {
 
   toggleMedia(sipSession, type, mute) {
     logger.debug('toggleMedia() [sipSession: %o, type: %s, mute: %s]', sipSession, type, mute);
-
-    const callId = sipSession.request.callId;
+    const callId = sipSession.sipSession.request.callId;
     const remoteStream = store.getState().sessions[callId].remoteStream;
     const localStream = store.getState().sessions[callId].localStream;
 
@@ -370,7 +372,7 @@ export default class SipCaller {
 
       store.dispatch(
         stateActions.toggleRemoteAudio({
-          sipSession,
+          sipSession: sipSession.sipSession,
         })
       );
     } else if (type === 'video') {
@@ -498,6 +500,7 @@ export default class SipCaller {
     const sipSession = session.sipSession;
     logger.debug('toggleMedia() [sipSession: %o, type: %s, mute: %s]', sipSession, type, mute);
 
+    console.log(sipSession); // temporary use
     const callId = sipSession.request.callId;
     const remoteStream = store.getState().sessions[callId].remoteStream;
     const localStream = store.getState().sessions[callId].localStream;
@@ -632,9 +635,16 @@ export default class SipCaller {
 
   toggleMyMedia(session, type, mute) {
     logger.debug('toggleMyMedia() [session: %o, type: %s, mute: %s]', session, type, mute);
-
+    const callId = session.sipSession.request.callId;
+    const localStream = store.getState().sessions[callId].localStream;
+    if (!localStream) return;
     if (type === 'audio') {
-      session.localStream.getAudioTracks()[0].enabled = !mute;
+      session.sipSession.localStream.getAudioTracks()[0].enabled = !mute;
+      store.dispatch(
+        stateActions.toggleLocalAudio({
+          sipSession: session.sipSession,
+        })
+      );
     } else if (type === 'video') {
       session.localStream.getVideoTracks()[0].enabled = !mute;
     } else {

@@ -22,7 +22,6 @@ const CallRinging = (props: any) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { sipCaller, session } = props;
-  console.log('I am going to check the session', session);
 
   const closeHandler = (e: MouseEvent<HTMLElement>): void => {
     e.preventDefault();
@@ -86,7 +85,7 @@ const CallRinging = (props: any) => {
           </div>
         </>
       )}
-      <div className={session && session.remoteStream ? 'mt-3 cursor-pointer p-5 bg-[#EA4335] rounded-full' : 'mt-60 cursor-pointer p-5 bg-[#EA4335] rounded-full'}>
+      <div className={session && session.remoteStream ? 'mt-7 cursor-pointer p-5 bg-[#EA4335] rounded-full' : 'mt-60 cursor-pointer p-5 bg-[#EA4335] rounded-full'}>
         <img src={Tele_Force_Images.CALL_END} width="32px" height="32px" alt="cancel" onClick={closeHandler} />
       </div>
     </div>

@@ -17,7 +17,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const persistor = persistStore(store);
 SipCaller.init({ store });
 const sipCaller: any = new SipCaller();
-global.sipCaller = sipCaller;
+// global.sipCaller = sipCaller;
 root.render(
   <React.StrictMode>
     <Provider store={store}>
